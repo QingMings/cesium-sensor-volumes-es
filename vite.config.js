@@ -9,17 +9,12 @@ export default defineConfig({
             exclude: ['cesium']
         },
         lib: {
-            formats: ['es', 'umd','iife'],
-            entry: resolve(__dirname,'./src/cesium-sensor-volumes.js'),
-            name: 'CesiumSensorVolumesEs'
+            formats: ['es', 'umd'],
+            entry: resolve(__dirname,'./lib/cesium-sensor-volumes.js'),
+            name: 'cesium-sensor-volumes'
         },
         rollupOptions: {
-            external: ['cesium'],
-            output: {
-                globals: {
-                    cesium: 'Cesium'
-                }
-            }
+            external: ['cesium']
         }
     }
 });
