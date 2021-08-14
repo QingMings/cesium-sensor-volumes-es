@@ -1,0 +1,17 @@
+{
+  "name": "cesium-sensor-volumes-es",
+  "version": "1.0.0",
+  "main": "cesium-sensor-volumes.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    
+    "vite": "^2.4.4",
+    "vite-plugin-cesium": "^1.2.5"
+  },
+  "peerDependencies": {
+    "cesium": "^1.84.0"
+  }
+}
