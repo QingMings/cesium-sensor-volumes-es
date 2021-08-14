@@ -11,7 +11,7 @@ export default defineConfig({
         lib: {
             formats: ['es', 'umd'],
             entry: resolve(__dirname,'./lib/cesium-sensor-volumes.js'),
-            name: 'cesium-sensor-volumes'
+            name: 'cesium-sensor-volumes-es'
         },
         rollupOptions: {
             external: ['cesium']
