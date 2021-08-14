@@ -17,9 +17,7 @@
     "build": "vite build"
   },
   "devDependencies": {
-    
-    "vite": "^2.4.4",
-    "vite-plugin-cesium": "^1.2.5"
+    "vite": "^2.4.4"
   },
   "peerDependencies": {
     "cesium": "^1.84.0"
