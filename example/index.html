@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../node_modules/cesium/Build/Cesium/Widgets/widgets.css" />
+    <script src="../node_modules/cesium/Build/Cesium/Cesium.js"></script>
+    <script src="../dist/cesium-sensor-volumes.umd.js"></script>
+
+    <style>
+		#cesiumContainer {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			margin: 0;
+			overflow: hidden;
+			padding: 0;
+			font-family: sans-serif;
+		}
+
+		html {
+			height: 100%;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+			height: 100%;
+		}
+
+		#toolbar {
+			margin: 5px;
+			padding: 2px 5px;
+			position: absolute;
+		}
+	</style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+<div id="toolbar"></div>
+<script>
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+		sceneModePicker : false
+	});
+
+	var longitude = Cesium.Math.toRadians(-90.0);
+	var latitude = Cesium.Math.toRadians(30.0);
+	var altitude = 3000000.0;
+	var clock = 0.0;
+	var cone = Cesium.Math.toRadians(15.0);
+	var twist = 0.0;
+
+	function getModelMatrix() {
+		var ellipsoid = viewer.scene.globe.ellipsoid;
+		var location = ellipsoid.cartographicToCartesian(new Cesium.Cartographic(longitude, latitude, altitude));
+		var modelMatrix = Cesium.Transforms.northEastDownToFixedFrame(location);
+		var orientation = Cesium.Matrix3.multiply(
+			Cesium.Matrix3.multiply(Cesium.Matrix3.fromRotationZ(clock), Cesium.Matrix3.fromRotationY(cone), new Cesium.Matrix3()),
+			Cesium.Matrix3.fromRotationX(twist), new Cesium.Matrix3()
+		);
+		return Cesium.Matrix4.multiply(modelMatrix, Cesium.Matrix4.fromRotationTranslation(orientation, Cesium.Cartesian3.ZERO), new Cesium.Matrix4());
+	}
+
+	function addRectangularSensor() {
+		viewer.scene.primitives.removeAll();
+		var rectangularPyramidSensor = new CesiumSensorVolumes.RectangularPyramidSensorVolume();
+
+		rectangularPyramidSensor.modelMatrix = getModelMatrix();
+		rectangularPyramidSensor.radius = 20000000.0;
+		rectangularPyramidSensor.xHalfAngle = Cesium.Math.toRadians(40.0);
+		rectangularPyramidSensor.yHalfAngle = Cesium.Math.toRadians(20.0);
+
+		rectangularPyramidSensor.lateralSurfaceMaterial = Cesium.Material.fromType('Color');
+		rectangularPyramidSensor.lateralSurfaceMaterial.uniforms.color = new Cesium.Color(0.0, 1.0, 1.0, 0.5);
+		viewer.scene.primitives.add(rectangularPyramidSensor);
+	}
+
+	function addCustomSensor() {
+		viewer.scene.primitives.removeAll();
+		var customSensor = new CesiumSensorVolumes.CustomSensorVolume();
+
+		var directions = [];
+		for (var i = 0; i < 8; ++i) {
+			var clock = Cesium.Math.toRadians(45.0 * i);
+			var cone = Cesium.Math.toRadians(25.0);
+			directions.push(new Cesium.Spherical(clock, cone));
+		}
+
+		customSensor.modelMatrix = getModelMatrix();
+		customSensor.radius = 20000000.0;
+		customSensor.directions = directions;
+		viewer.scene.primitives.add(customSensor);
+	}
+
+	function addConicSensor() {
+		viewer.scene.primitives.removeAll();
+		var position = Cesium.Cartesian3.fromDegrees(0, 0, 1000000);
+		var heading = Cesium.Math.toRadians(0);
+		var pitch = Cesium.Math.toRadians(90);
+		var roll = Cesium.Math.toRadians(0);
+		var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+		var orientation = Cesium.Transforms.headingPitchRollQuaternion(position, hpr);
+		const entity = new Cesium.Entity({
+			name: "Test",
+			position,
+			orientation,
+		});
+		entity.addProperty("conicSensor");
+		entity.conicSensor = new CesiumSensorVolumes.ConicSensorGraphics({
+			radius: 10000000,
+			innerHalfAngle: Cesium.Math.toRadians(0),
+			outerHalfAngle: Cesium.Math.toRadians(15),
+			lateralSurfaceMaterial: Cesium.Color.GOLD.withAlpha(0.15),
+			intersectionColor: Cesium.Color.GOLD.withAlpha(0.3),
+			intersectionWidth: 1,
+		});
+		viewer.entities.add(entity);
+	}
+
+	function addToolbarButton(text, onclick) {
+		var button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'cesium-button';
+		button.onclick = onclick;
+		button.textContent = text;
+		document.getElementById('toolbar').appendChild(button);
+	}
+
+	addToolbarButton('Rectangular', addRectangularSensor);
+	addToolbarButton('Custom', addCustomSensor);
+	addToolbarButton('Conic', addConicSensor);
+
+	addRectangularSensor();
+</script>
+</body>
+</html>
