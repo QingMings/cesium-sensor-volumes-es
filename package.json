@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/cesium-sensor-volumes.umd.js",
-  "module": "./dist/cesium-sensor-volumes.es.js",
+  "module": "./dist/cesium-sensor-volumes.mjs",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/cesium-sensor-volumes.es.js",
+      "import": "./dist/cesium-sensor-volumes.mjs",
       "require": "./dist/cesium-sensor-volumes.umd.js"
     }
   },
